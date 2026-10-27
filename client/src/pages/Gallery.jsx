@@ -61,3 +61,25 @@ export default function Gallery() {
         className="m-auto max-h-[92vh] w-[min(92vw,44rem)] overflow-auto rounded-lg border-2 border-ink bg-print p-0 backdrop:bg-ink/70">
         {sel && (
           <motion.div initial={{ opacity: 0, scale: 0.92, y: 24 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ type: 'spring', damping: 22 }} className="p-5">
+            <img src={sel.url} alt={sel.prompt} className="mx-auto max-h-[55vh] rounded-md object-contain" />
+            <p className="mt-4 font-medium">{sel.prompt}</p>
+            {sel.negative && <p className="text-mute">Left out: {sel.negative}</p>}
+            <dl className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+              {[['Steps', sel.steps], ['Guidance', sel.guidance], ['LoRA strength', sel.loraScale], ['Seed', sel.seed]].map(([k, v]) => (
+                <div key={k}><dt className="text-mute">{k}</dt><dd className="font-medium tabular-nums">{v}</dd></div>
+              ))}
+            </dl>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <a href={sel.url} download className="rounded-md bg-ink px-4 py-2 font-medium text-print">Download</a>
+              <button onClick={reuse} className="rounded-md border-2 border-ink px-4 py-2 font-medium">Reuse settings</button>
+              <button onClick={sure ? remove : () => setSure(true)} className="rounded-md border-2 border-red-800 px-4 py-2 font-medium text-red-800">
+                {sure ? 'Confirm delete' : 'Delete'}
+              </button>
+              <button onClick={() => setSel(null)} className="ml-auto rounded-md px-4 py-2 font-medium underline">Close</button>
+            </div>
+          </motion.div>
+        )}
+      </dialog>
+    </div>
+  );
+}
