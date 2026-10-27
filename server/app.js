@@ -82,3 +82,25 @@ app.post('/api/generate', requireAuth, genLimit, async (req, res) => {
 });
 
 // shortcut: newest 100 only, add paging when galleries outgrow that
+app.get('/api/images', requireAuth, async (req, res) => {
+  res.json((await Image.find({ user: req.uid }).sort({ createdAt: -1 }).limit(100)).map(dto));
+});
+
+app.delete('/api/images/:id', requireAuth, async (req, res) => {
+  const img = mongoose.isValidObjectId(req.params.id) && await Image.findOneAndDelete({ _id: req.params.id, user: req.uid });
+  if (!img) return fail(res, 404, 'Image not found.');
+  await fs.rm(path.join(uploads, img.file), { force: true });
+  res.sendStatus(204);
+});
+
+app.use('/uploads', express.static(uploads, { maxAge: '7d', immutable: true })); // unguessable filenames
+const dist = path.join(here, '../client/dist');
+app.use(express.static(dist));
+app.use((req, res, next) => req.path.startsWith('/api') ? next() : res.sendFile(path.join(dist, 'index.html'), (e) => e && next()));
+
+app.use((err, req, res, next) => {
+  if (err.code === 11000) return fail(res, 409, 'An account with this email already exists.');
+  if (err.status >= 400 && err.status < 500) return fail(res, err.status, 'Bad request.');
+  console.error(err);
+  fail(res, 500, 'Something went wrong on our side.');
+});
