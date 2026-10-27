@@ -27,3 +27,32 @@ body { background: var(--color-bench); color: var(--color-ink); font-family: var
 @keyframes safelight { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 .develop { animation: develop 2.8s ease-out both; }
 .safelight-pulse { animation: safelight 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .develop, .safelight-pulse { animation: none; } }
+
+/* Ambient light behind every page */
+.ambient { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.blob { position: absolute; border-radius: 9999px; filter: blur(90px); opacity: 0.32; }
+@keyframes drift-a { 50% { transform: translate(10vw, 8vh) scale(1.2); } }
+@keyframes drift-b { 50% { transform: translate(-8vw, -10vh) scale(1.15); } }
+.blob-a { animation: drift-a 24s ease-in-out infinite; }
+.blob-b { animation: drift-b 30s ease-in-out infinite; }
+
+/* Hero demo print: develops, holds, fades to the tray, repeats */
+@keyframes demo-loop {
+  0% { filter: brightness(0.1) contrast(1.6) grayscale(1) blur(22px); }
+  40%, 88% { filter: none; }
+  100% { filter: brightness(0.1) contrast(1.6) grayscale(1) blur(22px); }
+}
+.demo-loop { animation: demo-loop 8s ease-in-out infinite; }
+
+/* Prompt ticker */
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.marquee-track { display: flex; width: max-content; animation: marquee 50s linear infinite; }
+.marquee:hover .marquee-track, .marquee:focus-within .marquee-track { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .blob-a, .blob-b, .demo-loop, .marquee-track { animation: none; }
+  .marquee-track { flex-wrap: wrap; width: auto; }
+  .marquee-dup { display: none; }
+}
