@@ -1,6 +1,6 @@
 # Darkroom
 
-MERN image-generation site: React (Vite + Tailwind) client, FastAPI + MongoDB server, and a Python service that runs Stable Diffusion 1.5 with your LoRA.
+AI image-generation site: React (Vite + Tailwind) client, FastAPI + MongoDB server, and a Python service that runs Stable Diffusion 1.5 with your LoRA.
 
 ## Run it (three terminals)
 
