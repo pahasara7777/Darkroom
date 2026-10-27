@@ -17,3 +17,23 @@ function Range({ label, hint, value, onChange, ...r }) {
 export default function Studio() {
   const { state } = useLocation();
   const [f, setF] = useState({
+    prompt: '', negative: '', steps: 25, guidance: 7.5, loraScale: 1, seed: '',
+    ...state?.settings, ...(state?.prompt && { prompt: state.prompt }),
+  });
+  const [busy, setBusy] = useState(false);
+  const [secs, setSecs] = useState(0);
+  const [res, setRes] = useState(null);
+  const [err, setErr] = useState('');
+  const set = (k) => (v) => setF((o) => ({ ...o, [k]: v }));
+
+  useEffect(() => {
+    if (!busy) return;
+    setSecs(0);
+    const t = setInterval(() => setSecs((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [busy]);
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true); setErr(''); setRes(null);
+    try {
