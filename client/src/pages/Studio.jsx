@@ -56,3 +56,23 @@ export default function Studio() {
         <Range label="LoRA strength" min={0} max={1.5} step={0.05} value={f.loraScale} onChange={set('loraScale')} hint="0 is the base model. 1 is your trained style at full strength." />
         <label htmlFor="seed" className="mt-5 block font-medium">Seed</label>
         <input id="seed" type="number" min={0} step={1} value={f.seed} onChange={(e) => set('seed')(e.target.value)} className="field mt-1" placeholder="Random" />
+        <p className="text-sm text-mute">The same seed and settings give the same picture.</p>
+        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} disabled={busy} className="mt-6 w-full rounded-md bg-safelight px-4 py-3 font-bold text-ink hover:brightness-95 disabled:opacity-60">
+          {busy ? 'Developing…' : 'Develop image'}
+        </motion.button>
+        {err && <p role="alert" className="mt-4 font-medium text-red-800">{err}</p>}
+      </motion.form>
+
+      <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.25 }}>
+        <Tray key={res?.id} busy={busy} secs={secs} image={res} />
+        {res && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="mt-4 flex flex-wrap items-center gap-3">
+            <a href={res.url} download className="rounded-md bg-ink px-4 py-2 font-medium text-print">Download</a>
+            <Link to="/gallery" className="rounded-md px-4 py-2 font-medium underline">Open gallery</Link>
+            <span className="text-mute">Seed {res.seed}</span>
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
+  );
+}
