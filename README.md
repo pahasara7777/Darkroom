@@ -6,10 +6,9 @@ AI image-generation site: React (Vite + Tailwind) client, FastAPI + MongoDB serv
 
 1. **AI service** (needs an NVIDIA GPU for usable speed)
    ```
-   cd ai && pip install -r requirements.txt && uvicorn api:app --port 8000
+   cd model && pip install -r requirements.txt && uvicorn api:app --port 8000
    ```
-   No GPU? Run it free on Colab: [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pahasara7777/Darkroom/blob/main/ai/colab.ipynb)
-   `pytorch_lora_weights.safetensors` must sit in `ai/`. First start downloads the ~4 GB base model.
+   `pytorch_lora_weights.safetensors` must sit in `model/`. First start downloads the ~4 GB base model.
 2. **Server** (FastAPI, needs MongoDB running, Python 3.11+)
    ```
    cd server && pip install -r requirements.txt
