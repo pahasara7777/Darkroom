@@ -61,3 +61,24 @@ app.post('/api/generate', requireAuth, genLimit, async (req, res) => {
     prompt,
     negative: String(b.negative || '').slice(0, 500),
     steps: Math.round(num(b.steps, 10, 50, 25)),
+    guidance: num(b.guidance, 1, 15, 7.5),
+    loraScale: num(b.loraScale, 0, 1.5, 1),
+    seed: Number.isInteger(b.seed) && b.seed >= 0 ? b.seed : randomInt(2 ** 31), // stored so any print can be repeated
+  };
+  let png;
+  try {
+    const r = await fetch(IMAGE_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: p.prompt, negative: p.negative, steps: p.steps, guidance: p.guidance, lora_scale: p.loraScale, seed: p.seed }),
+      signal: AbortSignal.timeout(300_000),
+    });
+    if (!r.ok) throw new Error(r.status);
+    png = Buffer.from(await r.arrayBuffer());
+  } catch { return fail(res, 502, 'The image service is not responding. Try again in a moment.'); }
+  const file = randomUUID() + '.png';
+  await fs.writeFile(path.join(uploads, file), png);
+  res.status(201).json(dto(await Image.create({ user: req.uid, ...p, file })));
+});
+
+// shortcut: newest 100 only, add paging when galleries outgrow that
