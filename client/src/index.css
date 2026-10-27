@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bench: #e8ecee;
+  --color-ink: #16202a;
+  --color-tray: #1d6a72;
+  --color-safelight: #efa02e;
+  --color-print: #fbfbf8;
+  --color-rule: #c3ccd1;
+  --color-mute: #53606b;
+  --font-display: "Anybody", sans-serif;
+  --font-sans: "Hanken Grotesk", system-ui, sans-serif;
+}
+
+body { background: var(--color-bench); color: var(--color-ink); font-family: var(--font-sans); }
+:focus-visible { outline: 3px solid var(--color-tray); outline-offset: 2px; }
+
+.display { font-family: var(--font-display); font-stretch: 125%; font-weight: 800; letter-spacing: -0.02em; line-height: 0.98; }
+.field { width: 100%; border: 2px solid var(--color-ink); border-radius: 0.375rem; background: var(--color-print); padding: 0.6rem 0.75rem; }
+
+/* The one big moment: a print coming up in the tray. */
+@keyframes develop {
+  from { filter: brightness(0.1) contrast(1.6) grayscale(1) blur(20px); }
+  60% { filter: brightness(0.7) grayscale(0.6) blur(6px); }
+  to { filter: none; }
+}
+@keyframes safelight { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+.develop { animation: develop 2.8s ease-out both; }
+.safelight-pulse { animation: safelight 1.8s ease-in-out infinite; }
