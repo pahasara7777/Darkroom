@@ -1,0 +1,5 @@
+fastapi
+pymongo>=4.13
+pyjwt
+bcrypt
+httpx
