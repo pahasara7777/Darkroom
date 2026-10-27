@@ -22,3 +22,28 @@ const rise = { hidden: { y: '110%' }, show: { y: 0, transition: { type: 'spring'
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
 export default function Landing() {
+  const [prompt, setPrompt] = useState('');
+  const box = useRef(null);
+  const nav = useNavigate();
+  const pick = (t) => { setPrompt(t); box.current?.focus(); };
+
+  const chips = (dup) => (
+    <ul className={'flex ' + (dup ? 'marquee-dup' : '')} aria-hidden={dup || undefined}>
+      {examples.map((t) => (
+        <li key={t} className="mr-3">
+          <button tabIndex={dup ? -1 : 0} onClick={() => pick(t)}
+            className="whitespace-nowrap rounded-full border-2 border-ink bg-print px-4 py-2 hover:bg-safelight">{t}</button>
+        </li>
+      ))}
+    </ul>
+  );
+
+  return (
+    <>
+      <section className="grid items-center gap-10 py-10 lg:grid-cols-[1.1fr_1fr] lg:py-16">
+        <motion.div variants={group} initial="hidden" animate="show">
+          <h1 className="display text-5xl sm:text-6xl lg:text-7xl">
+            {headline.map((w, i) => (
+              <span key={i} className="mr-[0.25em] inline-block overflow-hidden pb-1 align-bottom">
+                <motion.span variants={rise} className="inline-block">{w}</motion.span>
+              </span>
