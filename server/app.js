@@ -40,3 +40,24 @@ const genLimit = rateLimit({ windowMs: 60_000, limit: 6, keyGenerator: (req) => 
 
 app.post('/api/auth/register', authLimit, async (req, res) => {
   const email = String(req.body.email || '').trim().toLowerCase();
+  const password = String(req.body.password || '');
+  if (!/^\S+@\S+\.\S+$/.test(email)) return fail(res, 400, 'Enter a valid email address.');
+  if (password.length < 8) return fail(res, 400, 'Use at least 8 characters for your password.');
+  if (await User.exists({ email })) return fail(res, 409, 'An account with this email already exists.');
+  res.status(201).json(session(await User.create({ email, hash: await bcrypt.hash(password, 10) })));
+});
+
+app.post('/api/auth/login', authLimit, async (req, res) => {
+  const user = await User.findOne({ email: String(req.body.email || '').trim().toLowerCase() });
+  if (!user || !(await bcrypt.compare(String(req.body.password || ''), user.hash))) return fail(res, 401, 'Email or password is wrong.');
+  res.json(session(user));
+});
+
+app.post('/api/generate', requireAuth, genLimit, async (req, res) => {
+  const b = req.body;
+  const prompt = String(b.prompt || '').trim().slice(0, 500);
+  if (!prompt) return fail(res, 400, 'Write a prompt first.');
+  const p = {
+    prompt,
+    negative: String(b.negative || '').slice(0, 500),
+    steps: Math.round(num(b.steps, 10, 50, 25)),
