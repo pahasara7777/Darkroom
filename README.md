@@ -24,6 +24,6 @@ MERN image-generation site: React (Vite + Tailwind) client, Express + MongoDB se
 
 ## Notes
 - Rename the site in `client/src/brand.js` and `client/index.html`.
-- Generated images are saved to `server/uploads/` on local disk. Move to S3 or similar before hosting on a platform with temporary disk.
+- Generated images are stored in MongoDB (Atlas free tier is 512 MB). Move to object storage when it fills.
 - The AI service makes one image at a time. The server allows 6 generations per minute per user.
 - Tests: `cd server && npm test` (uses a fake database, not real MongoDB).

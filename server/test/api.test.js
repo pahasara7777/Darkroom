@@ -14,6 +14,7 @@ mock.module(new URL('../models.js', import.meta.url).href, { namedExports: {
   },
   Image: {
     create: async (d) => { const i = { id: oid(), createdAt: new Date(), ...d }; images.push(i); return i; },
+    findById: (id) => ({ select: async () => images.find((i) => i.id === id) || null }),
     find: (q) => ({ sort: () => ({ limit: async () => images.filter((i) => i.user === q.user).reverse() }) }),
     findOneAndDelete: async (q) => { const k = images.findIndex((i) => i.id === q._id && i.user === q.user); return k < 0 ? null : images.splice(k, 1)[0]; },
   },

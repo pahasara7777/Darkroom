@@ -3,8 +3,7 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import rateLimit from 'express-rate-limit';
-import { randomUUID, randomInt } from 'node:crypto';
-import fs from 'node:fs/promises';
+import { randomInt } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { User, Image } from './models.js';
@@ -13,13 +12,11 @@ const { JWT_SECRET, IMAGE_API_URL = 'http://127.0.0.1:8000/generate' } = process
 if (!JWT_SECRET) throw new Error('JWT_SECRET is required');
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const uploads = path.join(here, 'uploads');
-await fs.mkdir(uploads, { recursive: true });
 
 const num = (v, min, max, d) => { const n = Number(v); return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : d; };
 const fail = (res, code, error) => res.status(code).json({ error });
 const dto = (i) => ({
-  id: i.id, url: '/uploads/' + i.file, prompt: i.prompt, negative: i.negative,
+  id: i.id, url: '/api/img/' + i.id, prompt: i.prompt, negative: i.negative,
   steps: i.steps, guidance: i.guidance, loraScale: i.loraScale, seed: i.seed, createdAt: i.createdAt,
 });
 const session = (u) => ({ token: jwt.sign({ sub: u.id }, JWT_SECRET, { expiresIn: '7d' }), user: { email: u.email } });
@@ -76,9 +73,7 @@ app.post('/api/generate', requireAuth, genLimit, async (req, res) => {
     if (!r.ok) throw new Error(r.status);
     png = Buffer.from(await r.arrayBuffer());
   } catch { return fail(res, 502, 'The image service is not responding. Try again in a moment.'); }
-  const file = randomUUID() + '.png';
-  await fs.writeFile(path.join(uploads, file), png);
-  res.status(201).json(dto(await Image.create({ user: req.uid, ...p, file })));
+  res.status(201).json(dto(await Image.create({ user: req.uid, ...p, data: png })));
 });
 
 // shortcut: newest 100 only, add paging when galleries outgrow that
@@ -89,11 +84,16 @@ app.get('/api/images', requireAuth, async (req, res) => {
 app.delete('/api/images/:id', requireAuth, async (req, res) => {
   const img = mongoose.isValidObjectId(req.params.id) && await Image.findOneAndDelete({ _id: req.params.id, user: req.uid });
   if (!img) return fail(res, 404, 'Image not found.');
-  await fs.rm(path.join(uploads, img.file), { force: true });
   res.sendStatus(204);
 });
 
-app.use('/uploads', express.static(uploads, { maxAge: '7d', immutable: true })); // unguessable filenames
+// public on purpose: <img> tags cannot send the auth header; ids are unguessable
+app.get('/api/img/:id', async (req, res) => {
+  const img = mongoose.isValidObjectId(req.params.id) && await Image.findById(req.params.id).select('+data');
+  if (!img) return fail(res, 404, 'Image not found.');
+  res.set({ 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=604800, immutable' }).send(img.data);
+});
+
 const dist = path.join(here, '../client/dist');
 app.use(express.static(dist));
 app.use((req, res, next) => req.path.startsWith('/api') ? next() : res.sendFile(path.join(dist, 'index.html'), (e) => e && next()));
