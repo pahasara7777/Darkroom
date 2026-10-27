@@ -71,3 +71,28 @@ export default function Landing() {
         <p className="mb-3 font-medium">Try one of these</p>
         <div className="marquee"><div className="marquee-track">{chips(false)}{chips(true)}</div></div>
       </section>
+
+      <section className="mt-10 border-t-2 border-ink py-14">
+        <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="display text-3xl sm:text-4xl">
+          Three steps, one tray
+        </motion.h2>
+        <ol className="mt-8 grid gap-8 md:grid-cols-3">
+          {steps.map(([title, text], i) => (
+            <motion.li key={title} initial={{ opacity: 0, x: -28 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-60px' }}
+              transition={{ delay: i * 0.12, duration: 0.5 }} className="border-l-4 border-tray pl-4">
+              <p className="display text-xl"><span className="text-tray">{i + 1}.</span> {title}</p>
+              <p className="mt-2 max-w-[34ch] text-mute">{text}</p>
+            </motion.li>
+          ))}
+        </ol>
+      </section>
+
+      <motion.section initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
+        transition={{ type: 'spring', damping: 20 }} className="rounded-lg bg-ink px-6 py-12 text-print sm:px-10">
+        <h2 className="display text-3xl sm:text-4xl">Your first print is one prompt away</h2>
+        <p className="mt-3 max-w-[40ch] text-print/80">Create a free account to start developing images and keep them in your own gallery.</p>
+        <MotionLink to="/register" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }} className="mt-6 inline-block rounded-md bg-safelight px-6 py-3 font-bold text-ink">Create account</MotionLink>
+      </motion.section>
+    </>
+  );
+}
