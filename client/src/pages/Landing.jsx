@@ -47,3 +47,27 @@ export default function Landing() {
               <span key={i} className="mr-[0.25em] inline-block overflow-hidden pb-1 align-bottom">
                 <motion.span variants={rise} className="inline-block">{w}</motion.span>
               </span>
+            ))}
+          </h1>
+          <motion.p variants={fadeUp} className="mt-6 max-w-[34rem] text-lg text-mute">
+            Type what you want to see. Your custom-trained model draws it, and every print is saved to your gallery.
+          </motion.p>
+          <motion.form variants={fadeUp} className="mt-8 max-w-[34rem]" onSubmit={(e) => { e.preventDefault(); nav('/studio', { state: { prompt } }); }}>
+            <label htmlFor="p" className="mb-1 block font-medium">What should it show?</label>
+            <textarea ref={box} id="p" rows={3} required maxLength={500} value={prompt} onChange={(e) => setPrompt(e.target.value)}
+              className="field" placeholder="A lighthouse on a cliff in a storm, oil painting" />
+            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} className="mt-3 rounded-md bg-safelight px-6 py-3 font-bold text-ink">Develop image</motion.button>
+          </motion.form>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, scale: 0.9, rotate: -4 }} animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', damping: 16, stiffness: 90, delay: 0.3 }} className="relative">
+          <Tray><Demo /></Tray>
+          {prompt && <p className="absolute inset-x-3 bottom-3 line-clamp-2 rounded bg-ink/85 px-3 py-2 text-print">{prompt}</p>}
+        </motion.div>
+      </section>
+
+      <section aria-label="Example prompts" className="py-4">
+        <p className="mb-3 font-medium">Try one of these</p>
+        <div className="marquee"><div className="marquee-track">{chips(false)}{chips(true)}</div></div>
+      </section>
